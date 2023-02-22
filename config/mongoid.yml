@@ -1,0 +1,6 @@
+development:
+  clients:
+    default:
+      uri: <%= "mongodb://mongodb:27017/#{ENV['MONGODB_NAME']}" %>
+  options:
+    raise_not_found_error: false

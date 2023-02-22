@@ -1,0 +1,29 @@
+services:
+  mongodb:
+    image: mongo:6.0.4
+    volumes:
+      - mongodb:/data/db
+    healthcheck:
+      test: "mongosh --eval 'db.runCommand('ping').ok' --quiet"
+
+  app:
+    build: .
+    image: sinatra-app
+    stop_signal: SIGINT
+    ports:
+      - "4567:4567"
+    healthcheck:
+      test: "curl --fail -s http://localhost:4567/health || exit 1"
+      interval: "60s"
+      timeout: "3s"
+      start_period: "5s"
+      retries: 3
+    depends_on:
+      - mongodb
+    links:
+      - mongodb
+    environment:
+      - MONGODB_NAME=development
+
+volumes:
+  mongodb:
