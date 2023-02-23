@@ -3,8 +3,8 @@ services:
     image: mongo:6.0.4
     volumes:
       - mongodb:/data/db
-    healthcheck:
-      test: "mongosh --eval 'db.runCommand('ping').ok' --quiet"
+    #healthcheck:
+    #  test: "mongosh --eval 'db.runCommand('ping').ok' --quiet"
 
   app:
     build: .

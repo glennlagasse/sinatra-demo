@@ -8,7 +8,7 @@ RUN apt-get update -qq \
   # Needed for certain gems
   build-essential \
   # Needed for postgres gem
-  libpq-dev \
+  # libpq-dev \
   # The following are used to trim down the size of the image by removing unneeded data
   && apt-get clean autoclean \
   && apt-get autoremove -y \
@@ -18,15 +18,15 @@ RUN apt-get update -qq \
   /var/lib/cache \
   /var/lib/log
 
-# Changes localtime to Singapore
+# Changes localtime to America/Los_Angeles
 RUN cp /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
 
 FROM base as dependencies
 
 COPY Gemfile ./
 
-RUN bundle config set without "development test" && \
-  bundle install --jobs=3 --retry=3
+RUN bundle config set without 'development test' && \
+    bundle install --jobs=3 --retry=3
 
 FROM base
 
@@ -38,11 +38,11 @@ WORKDIR /app
 
 # Copy over gems from the dependencies stage
 COPY --from=dependencies /usr/local/bundle/ /usr/local/bundle/
+COPY --chown=app --from=dependencies ./Gemfile.lock ./
 
-#COPY --chown=app . ./
-COPY . ./
+COPY --chown=app . ./
 
-EXPOSE 4567
+EXPOSE 4567/tcp
 
 # Launch the server
-CMD ["bundle", "exec", "rackup", "--host", "0.0.0.0", "-p", "4567"]
+CMD ["bundle", "exec", "rackup", "-s", "puma", "--host", "0.0.0.0", "-p", "4567"]

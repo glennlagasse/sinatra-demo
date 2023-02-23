@@ -1,10 +1,14 @@
+# frozen_string_literal: true
+
 require 'sinatra'
 require 'mongoid'
 
 Mongoid.load!(File.join(File.dirname(__FILE__), 'config', 'mongoid.yml'))
 
+# User Class
 class User
   include Mongoid::Document
+  include Mongoid::Timestamps
 
   field :username, type: String
 
@@ -21,7 +25,7 @@ get '/users' do
 end
 
 post '/users' do
-  #user = User.create!(params[:user])
+  # user = User.create!(params[:user])
   user = User.find_by(username: params[:user][:username])
   if user.nil?
     User.create!(params[:user])
@@ -29,7 +33,7 @@ post '/users' do
   else
     status 200
   end
-  #user = User.find_or_create_by(username: params[:user][:username])
+  # user = User.find_or_create_by(username: params[:user][:username])
   user.to_json
 end
 
