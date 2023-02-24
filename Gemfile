@@ -15,6 +15,9 @@ group :test do
 end
 
 group :development do
+  gem "http", "~> 5.1"
+  gem "pry", "~> 0.14.2"
   gem "rake", "~> 13.0"
   gem "rubocop", "~> 1.46"
+  gem "thor", "~> 1.2"
 end

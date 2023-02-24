@@ -12,8 +12,15 @@ class User
 
   field :username, type: String
 
+  validates :username, presence: true
+  index({ username: 'text'}, { unique: true})
+
   validates_uniqueness_of :username
+
+  scope :username, -> (username) { where(username: username) }
 end
+
+# TODO: Implement update/patch route
 
 get '/health' do
   content_type :json
@@ -21,28 +28,39 @@ get '/health' do
 end
 
 get '/users' do
+  content_type :json
   User.all.to_json
 end
 
 post '/users' do
-  # user = User.create!(params[:user])
-  user = User.find_by(username: params[:user][:username])
-  if user.nil?
-    User.create!(params[:user])
+  content_type :json
+
+  user = User.where(username: params[:username])
+
+  if user.length == 0
+    user = User.create!(params)
     status 201
   else
     status 200
   end
-  # user = User.find_or_create_by(username: params[:user][:username])
+
   user.to_json
 end
 
-get '/users/:id' do
-  user = User.find(params[:id])
+get '/users/:username' do |username|
+  content_type :json
+
+  user = User.where(username: username)
+
+  halt(404, { message:'User Not Found'}.to_json) unless user
+
   user.to_json
 end
 
-delete '/users/:id' do
-  user = User.find(params[:id]).delete
-  user.to_json
+delete '/users/:username' do |username|
+  content_type :json
+
+  User.where(username: username).delete
+
+  status 204
 end
